@@ -1,1 +1,3 @@
-This is forntend of my v-tueb project
+This is frontend of my video-tube project
+
+- [Live link](https://final-frontend-amber.vercel.app/)
