@@ -2,15 +2,13 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../api/axios';
-import VideoCard from '../components/VideoCard'; // We can reuse our VideoCard component!
+import VideoCard from '../components/VideoCard';
 
-// --- API Function ---
 const fetchPlaylistById = async (playlistId) => {
     const { data } = await apiClient.get(`/playlist/${playlistId}`);
     return data.data;
 };
 
-// --- Component ---
 function PlaylistDetail() {
     const { playlistId } = useParams();
 
@@ -30,7 +28,6 @@ function PlaylistDetail() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            {/* Playlist Header */}
             <div className="mb-8">
                 <h1 className="text-4xl font-bold text-text-primary mb-2">{playlist.name}</h1>
                 <p className="text-text-secondary text-lg">{playlist.description}</p>
@@ -43,10 +40,8 @@ function PlaylistDetail() {
 
             <div className="border-b border-border mb-8" />
 
-            {/* Video List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
                 {playlist.videos.map((video) => (
-                    // We can reuse the same VideoCard component we made for the Home page
                     <VideoCard key={video._id} video={video} />
                 ))}
             </div>

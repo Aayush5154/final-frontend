@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axios';
 
-// --- API Functions ---
 const fetchChannelStats = async () => {
     const { data } = await apiClient.get('/dashboard/stats');
     return data.data;
@@ -12,7 +11,7 @@ const fetchChannelStats = async () => {
 
 const fetchChannelVideos = async () => {
     const { data } = await apiClient.get('/dashboard/videos');
-    return data.data.videos; // The videos are inside data.data.videos
+    return data.data.videos;
 };
 
 const togglePublishStatus = async (videoId) => {
@@ -50,7 +49,6 @@ const updateUserCoverImage = async (coverImage) => {
     return data.data;
 };
 
-// --- Component ---
 function Dashboard() {
     const queryClient = useQueryClient();
     const { user } = useSelector((state) => state.auth);
@@ -58,13 +56,11 @@ function Dashboard() {
     const [playlistDescription, setPlaylistDescription] = useState('');
     const [coverImageFile, setCoverImageFile] = useState(null);
 
-    // Fetch channel stats
     const { data: stats, isLoading: isLoadingStats } = useQuery({
         queryKey: ['dashboardStats'],
         queryFn: fetchChannelStats,
     });
 
-    // Fetch channel videos
     const { data: videos, isLoading: isLoadingVideos } = useQuery({
         queryKey: ['dashboardVideos'],
         queryFn: fetchChannelVideos,
@@ -73,14 +69,12 @@ function Dashboard() {
     const { data: playlists, isLoading: isLoadingPlaylists } = useQuery({
         queryKey: ['playlists', user?._id],
         queryFn: () => fetchUserPlaylists(user?._id),
-        enabled: !!user, // Only run this query if the user is loaded
+        enabled: !!user,
     });
 
-    // Mutation for toggling publish status
     const togglePublishMutation = useMutation({
         mutationFn: togglePublishStatus,
         onSuccess: () => {
-            // When successful, refetch the videos to show the updated status
             queryClient.invalidateQueries({ queryKey: ['dashboardVideos'] });
         },
     });
@@ -88,8 +82,6 @@ function Dashboard() {
     const deleteVideoMutation = useMutation({
         mutationFn: deleteVideo,
         onSuccess: () => {
-            // When a video is deleted, refetch both stats and videos
-            // to keep everything on the page up-to-date.
             queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
             queryClient.invalidateQueries({ queryKey: ['dashboardVideos'] });
             alert('Video deleted successfully!');
@@ -116,7 +108,6 @@ function Dashboard() {
     const deletePlaylistMutation = useMutation({
         mutationFn: deletePlaylist,
         onSuccess: () => {
-            // When a playlist is deleted, refetch the playlist list
             queryClient.invalidateQueries({ queryKey: ['playlists', user?._id] });
             alert('Playlist deleted successfully!');
         },
@@ -128,11 +119,10 @@ function Dashboard() {
     const coverImageMutation = useMutation({
         mutationFn: updateUserCoverImage,
         onSuccess: () => {
-            // Refetch the user's data everywhere to show the new image
             queryClient.invalidateQueries({ queryKey: ['channel', user.username] });
-            queryClient.invalidateQueries({ queryKey: ['dashboardStats'] }); // Stats includes channel info
+            queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
             alert('Cover image updated successfully!');
-            setCoverImageFile(null); // Clear the file input
+            setCoverImageFile(null);
         },
         onError: (error) => {
             alert(`Failed to update cover image: ${error.response?.data?.message || error.message}`);
@@ -144,7 +134,6 @@ function Dashboard() {
     };
 
     const handleDeleteVideo = (videoId) => {
-        // Show a simple browser confirmation dialog
         if (window.confirm("Are you sure you want to delete this video? This action cannot be undone.")) {
             deleteVideoMutation.mutate(videoId);
         }
@@ -186,7 +175,6 @@ function Dashboard() {
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold text-text-primary mb-6">Your Dashboard</h1>
 
-            {/* Channel Settings */}
             <div className="bg-background-secondary border border-border p-6 rounded-xl mb-8">
                 <h2 className="text-xl font-bold text-text-primary mb-4">Channel Settings</h2>
                 <div className="mb-6">
@@ -214,7 +202,6 @@ function Dashboard() {
                 </form>
             </div>
 
-            {/* Stats Section */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-background-secondary border border-border p-4 rounded-xl text-center">
                     <p className="text-2xl font-bold text-text-primary">{stats?.totalSubscribers || 0}</p>
@@ -235,7 +222,6 @@ function Dashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                {/* Create Playlist Form */}
                 <div className="bg-background-secondary border border-border p-6 rounded-xl">
                     <h2 className="text-xl font-bold text-text-primary mb-4">Create New Playlist</h2>
                     <form onSubmit={handleCreatePlaylist} className="space-y-4">
@@ -269,7 +255,6 @@ function Dashboard() {
                     </form>
                 </div>
 
-                {/* List of Playlists */}
                 <div className="bg-background-secondary border border-border p-6 rounded-xl">
                     <h2 className="text-xl font-bold text-text-primary mb-4">Your Playlists</h2>
                     <div className="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
@@ -293,7 +278,6 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Videos Table */}
             <h2 className="text-2xl font-bold text-text-primary mb-4">Your Videos</h2>
             <div className="bg-background-secondary border border-border rounded-xl overflow-hidden">
                 <table className="w-full text-left">

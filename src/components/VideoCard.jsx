@@ -9,16 +9,14 @@ function VideoCard({ video }) {
         return views;
     };
 
-    // Prevent errors if video or owner data is missing
     if (!video || !video.owner) {
-        return null; // Or return a loading skeleton
+        return null;
     }
 
     return (
         <div className="w-full">
-            {/* Link for Thumbnail */}
             <Link to={`/video/${video._id}`}>
-                <div className="relative mb-3 w-full pt-[56.25%] group"> {/* 16:9 Aspect Ratio */}
+                <div className="relative mb-3 w-full pt-[56.25%] group">
                     <img
                         src={video.thumbnail}
                         alt={video.title}
@@ -30,7 +28,6 @@ function VideoCard({ video }) {
                 </div>
             </Link>
             <div className="flex items-start px-1">
-                {/* Link for Avatar */}
                 <Link to={`/channel/${video.owner.username}`} className="flex-shrink-0 mt-0.5">
                     <img
                         src={video.owner.avatar}
@@ -39,13 +36,11 @@ function VideoCard({ video }) {
                     />
                 </Link>
                 <div className="ml-3 flex-grow min-w-0">
-                    {/* Link for Title */}
                     <Link to={`/video/${video._id}`}>
                         <h3 className="text-base font-semibold text-text-primary line-clamp-2 leading leading-snug hover:text-white mb-1">
                             {video.title}
                         </h3>
                     </Link>
-                    {/* Link for Username */}
                     <Link to={`/channel/${video.owner.username}`}>
                         <p className="text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center">
                             {video.owner.fullName || video.owner.username}

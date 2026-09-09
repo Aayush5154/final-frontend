@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
 
-// --- API Functions ---
 const fetchVideoById = async (videoId) => {
     const { data } = await apiClient.get(`/videos/${videoId}`);
     return data.data;
@@ -18,46 +17,40 @@ const updateVideoDetails = async ({ videoId, formData }) => {
     return data.data;
 };
 
-// --- Component ---
 function EditVideo() {
     const { videoId } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    // State for the form fields
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        thumbnail: null, // This will hold the new thumbnail file if selected
+        thumbnail: null,
     });
     const [error, setError] = useState('');
 
-    // 1. Fetch the current video data to pre-fill the form
     const { data: video, isLoading } = useQuery({
         queryKey: ['video', videoId],
         queryFn: () => fetchVideoById(videoId),
         enabled: !!videoId,
     });
 
-    // 2. Use useEffect to update the form state once the video data is loaded
     useEffect(() => {
         if (video) {
             setFormData({
                 title: video.title,
                 description: video.description,
-                thumbnail: null, // Reset thumbnail on data load
+                thumbnail: null,
             });
         }
     }, [video]);
 
-    // 3. Create the mutation for updating the video
     const updateMutation = useMutation({
         mutationFn: updateVideoDetails,
         onSuccess: () => {
-            // Invalidate queries to refetch data on dashboard and video page
             queryClient.invalidateQueries({ queryKey: ['dashboardVideos'] });
             queryClient.invalidateQueries({ queryKey: ['video', videoId] });
-            navigate('/dashboard'); // Redirect to dashboard on success
+            navigate('/dashboard');
         },
         onError: (err) => {
             setError(err.response?.data?.message || 'Update failed. Please try again.');
@@ -80,7 +73,6 @@ function EditVideo() {
         const submissionData = new FormData();
         submissionData.append('title', formData.title);
         submissionData.append('description', formData.description);
-        // Only append the thumbnail if a new one has been selected
         if (formData.thumbnail) {
             submissionData.append('thumbnail', formData.thumbnail);
         }

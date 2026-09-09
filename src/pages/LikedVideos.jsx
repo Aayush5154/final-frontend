@@ -28,8 +28,6 @@ function LikedVideos() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
                 {likedVideos?.map((item) => (
-                    // The backend returns an array of objects where the video itself is in the 'video' property
-                    // item = { _id, video: { ...videoDetails }, ... }
                     <VideoCard key={item._id} video={item.video} />
                 ))}
             </div>

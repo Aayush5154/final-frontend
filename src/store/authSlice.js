@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    // We will check for user data in localStorage to keep them logged in
     isAuthenticated: false,
     user: null, 
 };

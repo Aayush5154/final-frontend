@@ -45,7 +45,6 @@ function UploadVideo() {
             });
 
             if (response.data && response.data.success) {
-                // On success, navigate to the new video's detail page
                 const newVideoId = response.data.data._id;
                 navigate(`/video/${newVideoId}`);
             }

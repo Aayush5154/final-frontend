@@ -6,7 +6,6 @@ import apiClient from '../../api/axios';
 
 const fetchSubscribedChannels = async (userId) => {
     if (!userId) return [];
-    // Endpoint: /subscriptions/c/:subscriberId
     const { data } = await apiClient.get(`/subscriptions/c/${userId}`);
     return data.data.subscribedChannels;
 };
@@ -18,24 +17,11 @@ function Sidebar({ isOpen, onClose }) {
         queryKey: ['subscribedChannels', user?._id],
         queryFn: () => fetchSubscribedChannels(user?._id),
         enabled: !!user,
-        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+        staleTime: 5 * 60 * 1000,
     });
 
-    // Restrict Sidebar to only Home page
     const location = useLocation();
     if (location.pathname !== '/' && location.pathname !== '/history' && location.pathname !== '/liked-videos' && location.pathname !== '/subscriptions') {
-        // NOTE: User requested "only be present in the home page".
-        // However, standard sidebar behavior usually keeps it on these "drawer" pages too.
-        // If strict "only home page" is needed: location.pathname !== '/'
-        // But for UX, history/liked/subs pages should probably also have the sidebar?
-        // Let's stick to strict interpretation first OR standard pattern.
-        // Interpretation: "not on other pages" usually means video details, login, etc.
-        // Let's allow it on the main "feed" type pages (Home, Tweets, History, Liked, Subs)
-
-        // Actually, user said: "only be presetn in the home page not on th epther pages"
-        // I will follow strict instruction: ONLY Home page (and maybe the new pages I just created? Standard UX would have it there).
-        // Let's enable it for Home, Tweets, and the new generic pages, but hide on VideoDetail etc.
-        // Allow sidebar on specific paths and dynamic routes (video, channel, playlist)
         const allowedPaths = ['/', '/tweets', '/history', '/liked-videos', '/subscriptions', '/upload-video', '/dashboard'];
         const isDynamicAllowed = location.pathname.startsWith('/video/') ||
             location.pathname.startsWith('/channel/') ||
@@ -75,9 +61,6 @@ function Sidebar({ isOpen, onClose }) {
         },
     ];
 
-    // Responsive classes
-    // Desktop: Always visible (w-64), sidebar mode
-    // Mobile: Hidden by default, slides in (fixed inset-0)
     const sidebarClasses = `
         fixed top-[64px] left-0 h-[calc(100vh-64px)] w-64 bg-background-secondary overflow-y-auto custom-scrollbar pb-4
         transform transition-transform duration-300 z-40 border-r border-border
@@ -86,7 +69,6 @@ function Sidebar({ isOpen, onClose }) {
 
     return (
         <>
-            {/* Mobile Overlay */}
             {isOpen && (
                 <div
                     className="md:hidden fixed inset-0 bg-black/50 z-30"
@@ -96,7 +78,6 @@ function Sidebar({ isOpen, onClose }) {
 
             <aside className={sidebarClasses}>
                 <div className="py-2">
-                    {/* Main Navigation */}
                     <ul className="space-y-1 px-3">
                         {mainLinks.map((link) => (
                             <li key={link.name}>
@@ -114,7 +95,6 @@ function Sidebar({ isOpen, onClose }) {
 
                     <div className="my-3 border-t border-border mx-4" />
 
-                    {/* Subscriptions Section */}
                     {isAuthenticated && (
                         <div className="px-3">
                             <h3 className="px-3 text-base font-semibold text-text-primary mb-2 mt-2">Subscriptions</h3>

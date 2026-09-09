@@ -5,10 +5,8 @@ import apiClient from '../api/axios';
 import { Link } from 'react-router-dom';
 import { formatTimeAgo } from '../utils/time';
 
-// --- API Functions ---
 const fetchComments = async (videoId) => {
     const { data } = await apiClient.get(`/comments/${videoId}`);
-    // The API response for comments might be paginated, we'll take the docs
     return data.data.docs;
 };
 
@@ -17,26 +15,22 @@ const addComment = async ({ videoId, content }) => {
     return data.data;
 };
 
-// --- Component ---
 function CommentList({ videoId }) {
     const queryClient = useQueryClient();
     const { isAuthenticated, user } = useSelector((state) => state.auth);
     const [newComment, setNewComment] = useState('');
 
-    // Query to fetch comments for the video
     const { data: comments, isLoading } = useQuery({
         queryKey: ['comments', videoId],
         queryFn: () => fetchComments(videoId),
         enabled: !!videoId,
     });
 
-    // Mutation to add a new comment
     const addCommentMutation = useMutation({
         mutationFn: addComment,
         onSuccess: () => {
-            // When a comment is added, invalidate the comments query to refetch the list
             queryClient.invalidateQueries({ queryKey: ['comments', videoId] });
-            setNewComment(''); // Clear the input field
+            setNewComment('');
         },
     });
 
@@ -50,7 +44,6 @@ function CommentList({ videoId }) {
         <div className="mt-6">
             <h3 className="text-xl font-bold text-text-primary mb-4">{comments?.length || 0} Comments</h3>
 
-            {/* Add Comment Form */}
             {isAuthenticated && (
                 <div className="mb-6">
                     <form onSubmit={handleCommentSubmit} className="flex items-start space-x-4">
@@ -75,7 +68,6 @@ function CommentList({ videoId }) {
                 </div>
             )}
 
-            {/* Display Comments */}
             {isLoading ? (
                 <p className="text-text-secondary animate-pulse">Loading comments...</p>
             ) : (

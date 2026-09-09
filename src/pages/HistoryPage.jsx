@@ -5,7 +5,7 @@ import VideoCard from '../components/VideoCard';
 
 const fetchWatchHistory = async () => {
     const { data } = await apiClient.get('/user/history');
-    return data.data; // The controller returns the watchHistory array directly
+    return data.data;
 };
 
 function HistoryPage() {

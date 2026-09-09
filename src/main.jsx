@@ -7,12 +7,11 @@ import store from './store/store.js';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Import all your pages
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import Dashboard from './pages/Dashboard.jsx';
-import VideoDetail from './pages/VideoDetail.jsx'; // Make sure this is imported
+import VideoDetail from './pages/VideoDetail.jsx';
 import UploadVideo from './pages/UploadVideo.jsx';
 import EditVideo from './pages/EditVideo.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -29,7 +28,7 @@ const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
-    element: <RootLayout />, // The RootLayout now wraps everything
+    element: <RootLayout />,
     children: [
       {
         path: '/',
@@ -65,7 +64,7 @@ const router = createBrowserRouter([
                 element: <Dashboard />,
               },
               {
-                path: 'upload-video', // Let's protect this too
+                path: 'upload-video',
                 element: <UploadVideo />,
               },
               {
@@ -76,7 +75,6 @@ const router = createBrowserRouter([
               { path: 'history', element: <HistoryPage /> },
               { path: 'liked-videos', element: <LikedVideos /> },
               { path: 'subscriptions', element: <SubscriptionsPage /> },
-              // Add any other protected routes here in the future
             ]
           }
         ],

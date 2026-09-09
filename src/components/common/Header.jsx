@@ -12,21 +12,11 @@ function Header({ toggleSidebar }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const handleLogout = async () => {
-        // We will show a loading state on the button if needed, but for now, this is robust.
         try {
-            // 1. Await the API call. We will not proceed until the server
-            //    confirms that the session has been destroyed.
             await apiClient.post('/user/logout');
-
-            // 2. Once the server confirms, THEN we update the frontend state.
             dispatch(logout());
-
-            // 3. Navigate to a safe page like home or login.
             navigate('/login');
-
         } catch (error) {
-            // If the API call fails for some reason (e.g., network error),
-            // it's safest to still log the user out on the frontend.
             console.error("Logout API call failed, but logging out on frontend anyway.", error);
             dispatch(logout());
             navigate('/login');
@@ -42,7 +32,6 @@ function Header({ toggleSidebar }) {
         <header className="bg-background-secondary border-b border-border sticky top-0 z-50 h-[64px]">
             <nav className="container-fluid px-4 h-full">
                 <div className="flex justify-between items-center h-full">
-                    {/* Left side: Hamburger, Logo */}
                     <div className="flex items-center space-x-4">
                         {!['/login', '/signup'].includes(location.pathname) && (
                             <button
@@ -54,7 +43,6 @@ function Header({ toggleSidebar }) {
                         )}
 
                         <Link to="/" className="flex items-center space-x-1 group">
-                            {/* Custom Red Play Icon */}
                             <div className="w-8 h-6 bg-primary rounded-lg flex items-center justify-center group-hover:bg-primary-hover transition-colors">
                                 <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[8px] border-l-white border-b-[4px] border-b-transparent ml-0.5"></div>
                             </div>
@@ -62,15 +50,9 @@ function Header({ toggleSidebar }) {
                         </Link>
                     </div>
 
-                    {/* Center: Desktop Nav (Optional, mostly moved to sidebar but keeping top links if needed) */}
-                    {/* For YouTube style, main nav is in sidebar. We can keep search here later. */}
                     <div className="hidden md:flex flex-1 justify-center max-w-xl mx-4">
-                        {/* Placeholder for future search bar */}
-
                     </div>
 
-
-                    {/* Right side: Desktop Auth Buttons */}
                     <div className="flex items-center space-x-2 sm:space-x-4">
                         {isAuthenticated ? (
                             <>

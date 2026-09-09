@@ -5,9 +5,7 @@ import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
 import CommentList from '../components/CommentList';
 import PlaylistModal from '../components/PlaylistModal';
-//import { useSelector } from 'react-redux';
 
-// --- API Functions ---
 const fetchVideoById = async (videoId) => {
     const { data } = await apiClient.get(`/videos/${videoId}`);
     return data.data;
@@ -23,27 +21,22 @@ const toggleVideoLike = async (videoId) => {
     return data.data;
 };
 
-// --- Component ---
 function VideoDetail() {
     const { videoId } = useParams();
-    const queryClient = useQueryClient(); // Get the query client instance
-    const { isAuthenticated } = useSelector((state) => state.auth); // Check if user is logged in
+    const queryClient = useQueryClient();
+    const { isAuthenticated } = useSelector((state) => state.auth);
     const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
-
 
     const { data: video, error, isLoading, isError } = useQuery({
         queryKey: ['video', videoId],
         queryFn: () => fetchVideoById(videoId),
         enabled: !!videoId,
     });
-    const { user: loggedInUser } = useSelector((state) => state.auth); // Get the logged-in user
+    const { user: loggedInUser } = useSelector((state) => state.auth);
 
-    // --- Mutations ---
     const subscriptionMutation = useMutation({
         mutationFn: toggleSubscription,
         onSuccess: () => {
-            // When the mutation is successful, invalidate the video query to refetch data
-            // This will automatically update the subscriber count and button state!
             queryClient.invalidateQueries({ queryKey: ['video', videoId] });
         },
     });
@@ -51,12 +44,10 @@ function VideoDetail() {
     const likeMutation = useMutation({
         mutationFn: toggleVideoLike,
         onSuccess: () => {
-            // Invalidate and refetch to update the like count and button state
             queryClient.invalidateQueries({ queryKey: ['video', videoId] });
         },
     });
 
-    // --- Event Handlers ---
     const handleSubscribe = () => {
         if (!isAuthenticated) {
             alert("Please log in to subscribe.");
@@ -73,7 +64,6 @@ function VideoDetail() {
         likeMutation.mutate(videoId);
     };
 
-    // --- Render Logic ---
     if (isLoading) return <div className="text-center p-8">Loading video...</div>;
     if (isError) return <div className="text-center p-8">Error: {error.message}</div>;
 
@@ -97,7 +87,6 @@ function VideoDetail() {
                                 <span>{new Date(video.createdAt).toLocaleDateString()}</span>
                             </div>
                             <div className="flex items-center space-x-2">
-                                {/* Like Button */}
                                 <button
                                     onClick={handleLike}
                                     disabled={likeMutation.isPending}
@@ -133,7 +122,6 @@ function VideoDetail() {
                                 <p className="text-xs text-text-secondary">{formatNumber(video.owner.subscribersCount)} subscribers</p>
                             </div>
                         </div>
-                        {/* Subscribe Button */}
                         {!isOwner && (
                             <button
                                 onClick={handleSubscribe}

@@ -4,10 +4,9 @@ import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
 import { formatTimeAgo } from '../utils/time';
 
-// --- API Functions ---
 const fetchAllTweets = async () => {
-    const { data } = await apiClient.get('/tweets'); // <-- Use the new simpler endpoint
-    return data.data; // The backend returns the array directly in data.data
+    const { data } = await apiClient.get('/tweets');
+    return data.data;
 };
 
 const createTweet = async (content) => {
@@ -15,21 +14,16 @@ const createTweet = async (content) => {
     return data.data;
 };
 
-
-// --- Component ---
 function TweetsPage() {
     const queryClient = useQueryClient();
     const { isAuthenticated, user } = useSelector((state) => state.auth);
     const [tweetContent, setTweetContent] = useState('');
 
-    // Query to fetch tweets
-    // We'll need to expand this later to be a real feed.
     const { data: tweets, isLoading } = useQuery({
-        queryKey: ['allTweets'], // Use a new query key
-        queryFn: fetchAllTweets, // Use the new fetch function
+        queryKey: ['allTweets'],
+        queryFn: fetchAllTweets,
     });
 
-    // Mutation to create a new tweet
     const createTweetMutation = useMutation({
         mutationFn: createTweet,
         onSuccess: () => {
@@ -48,7 +42,6 @@ function TweetsPage() {
         <div className="container mx-auto px-4 py-8 max-w-2xl">
             <h1 className="text-3xl font-bold text-text-primary mb-6">Tweets</h1>
 
-            {/* Create Tweet Form */}
             {isAuthenticated && (
                 <div className="bg-background-secondary border border-border p-4 rounded-xl mb-8">
                     <form onSubmit={handleTweetSubmit} className="flex items-start space-x-4">
@@ -71,7 +64,6 @@ function TweetsPage() {
                 </div>
             )}
 
-            {/* Tweet List */}
             {isLoading ? (
                 <div className="text-center p-8">
                     <p className="text-text-secondary animate-pulse">Loading tweets...</p>

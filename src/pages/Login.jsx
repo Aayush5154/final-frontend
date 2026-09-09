@@ -26,7 +26,6 @@ function Login() {
         e.preventDefault();
         setError('');
         setLoading(true);
-        // Prepare payload to allow login with either username or email
         const payload = {
             username: formData.email,
             email: formData.email,
@@ -36,10 +35,9 @@ function Login() {
         try {
             const response = await apiClient.post('/user/login', payload);
             if (response.data && response.data.success) {
-                // The backend sends user data inside a 'data' object
                 const { user } = response.data.data;
                 dispatch(authLogin(user));
-                navigate('/'); // Redirect to home page
+                navigate('/');
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
@@ -90,7 +88,6 @@ function Login() {
                             <label htmlFor="password" className="block text-sm font-medium text-text-secondary">
                                 Password
                             </label>
-                            {/* Add Forgot Password link here later if needed */}
                         </div>
                         <input
                             id="password"

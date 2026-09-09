@@ -40,7 +40,6 @@ function Signup() {
         setError('');
         setLoading(true);
 
-        // We use FormData because we are sending a file
         const submissionData = new FormData();
         submissionData.append('fullname', formData.fullName);
         submissionData.append('username', formData.username);
@@ -56,7 +55,6 @@ function Signup() {
             });
 
             if (response.data && response.data.success) {
-                // On successful registration, redirect to the login page
                 navigate('/login');
             }
         } catch (err) {
