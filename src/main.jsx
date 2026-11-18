@@ -23,6 +23,8 @@ import RootLayout from './RootLayout.jsx';
 import HistoryPage from './pages/HistoryPage.jsx';
 import LikedVideos from './pages/LikedVideos.jsx';
 import SubscriptionsPage from './pages/SubscriptionsPage.jsx';
+import WatchLaterPage from './pages/WatchLaterPage.jsx';
+import NotificationsPage from './pages/NotificationsPage.jsx';
 
 const queryClient = new QueryClient();
 
@@ -73,6 +75,8 @@ const router = createBrowserRouter([
               },
               { path: 'tweets', element: <TweetsPage /> },
               { path: 'history', element: <HistoryPage /> },
+              { path: 'watch-later', element: <WatchLaterPage /> },
+              { path: 'notifications', element: <NotificationsPage /> },
               { path: 'liked-videos', element: <LikedVideos /> },
               { path: 'subscriptions', element: <SubscriptionsPage /> },
             ]

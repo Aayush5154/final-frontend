@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
@@ -21,11 +21,28 @@ const toggleVideoLike = async (videoId) => {
     return data.data;
 };
 
+const toggleWatchLater = async ({ videoId, isInWatchLater }) => {
+    if (isInWatchLater) {
+        await apiClient.delete(`/watch-later/${videoId}`);
+    } else {
+        await apiClient.post(`/watch-later/${videoId}`);
+    }
+};
+
+const sendWatchProgress = (videoId, progress, duration) => {
+    apiClient.put(`/progress/${videoId}`, {
+        progress: Math.floor(progress),
+        duration: Math.floor(duration || 0),
+    }).catch(() => {});
+};
+
 function VideoDetail() {
     const { videoId } = useParams();
     const queryClient = useQueryClient();
     const { isAuthenticated } = useSelector((state) => state.auth);
     const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
+    const videoRef = useRef(null);
+    const lastSavedProgress = useRef(0);
 
     const { data: video, error, isLoading, isError } = useQuery({
         queryKey: ['video', videoId],
@@ -48,6 +65,49 @@ function VideoDetail() {
         },
     });
 
+    const watchLaterMutation = useMutation({
+        mutationFn: toggleWatchLater,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['video', videoId] });
+            queryClient.invalidateQueries({ queryKey: ['watchLater'] });
+        },
+    });
+
+    useEffect(() => {
+        if (!isAuthenticated || !videoId) return undefined;
+
+        const interval = setInterval(() => {
+            const player = videoRef.current;
+            if (!player || player.paused || !Number.isFinite(player.duration)) return;
+
+            const current = Math.floor(player.currentTime);
+            if (Math.abs(current - lastSavedProgress.current) < 5) return;
+
+            lastSavedProgress.current = current;
+            sendWatchProgress(videoId, current, player.duration);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [isAuthenticated, videoId]);
+
+    const handleLoadedMetadata = () => {
+        const player = videoRef.current;
+        if (!player || !video?.progress) return;
+
+        if (video.progress > 5 && video.progress < player.duration - 5) {
+            player.currentTime = video.progress;
+            lastSavedProgress.current = video.progress;
+        }
+    };
+
+    const handleProgressSave = () => {
+        const player = videoRef.current;
+        if (!isAuthenticated || !player || !Number.isFinite(player.duration)) return;
+
+        lastSavedProgress.current = Math.floor(player.currentTime);
+        sendWatchProgress(videoId, player.currentTime, player.duration);
+    };
+
     const handleSubscribe = () => {
         if (!isAuthenticated) {
             alert("Please log in to subscribe.");
@@ -64,6 +124,14 @@ function VideoDetail() {
         likeMutation.mutate(videoId);
     };
 
+    const handleWatchLater = () => {
+        if (!isAuthenticated) {
+            alert("Please log in to save videos for later.");
+            return;
+        }
+        watchLaterMutation.mutate({ videoId, isInWatchLater: video.isInWatchLater });
+    };
+
     if (isLoading) return <div className="text-center p-8">Loading video...</div>;
     if (isError) return <div className="text-center p-8">Error: {error.message}</div>;
 
@@ -76,7 +144,17 @@ function VideoDetail() {
             <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
                     <div className="w-full bg-black aspect-video rounded-xl overflow-hidden shadow-lg border border-border">
-                        <video src={video.videoFile} controls autoPlay muted className="w-full h-full"></video>
+                        <video
+                            ref={videoRef}
+                            src={video.videoFile}
+                            controls
+                            autoPlay
+                            muted
+                            className="w-full h-full"
+                            onLoadedMetadata={handleLoadedMetadata}
+                            onPause={handleProgressSave}
+                            onEnded={handleProgressSave}
+                        ></video>
                     </div>
                     <div className="mt-4">
                         <h1 className="text-xl md:text-2xl font-bold text-text-primary">{video.title}</h1>
@@ -99,10 +177,23 @@ function VideoDetail() {
                                     <span>{formatNumber(video.likesCount)}</span>
                                 </button>
                                 <button
+                                    onClick={handleWatchLater}
+                                    disabled={watchLaterMutation.isPending}
+                                    className={`px-4 py-2 text-sm font-semibold rounded-full flex items-center space-x-2 transition-colors disabled:opacity-50 ${video.isInWatchLater
+                                            ? 'bg-white text-black hover:bg-gray-200'
+                                            : 'bg-white/10 text-white hover:bg-white/20'
+                                        }`}
+                                >
+                                    <svg className="w-4 h-4" fill={video.isInWatchLater ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z" />
+                                    </svg>
+                                    <span>{video.isInWatchLater ? 'Saved' : 'Watch Later'}</span>
+                                </button>
+                                <button
                                     onClick={() => setIsPlaylistModalOpen(true)}
                                     className="px-4 py-2 text-sm font-semibold bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors flex items-center gap-2"
                                 >
-                                    <span>➕</span> Save
+                                    <span>➕</span> Save to Playlist
                                 </button>
                             </div>
                         </div>

@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { logout } from '../../store/authSlice';
 import apiClient from '../../api/axios';
 
+const fetchUnreadCount = async () => {
+    const { data } = await apiClient.get('/notifications/unread-count');
+    return data.data.unreadCount;
+};
+
 function Header({ toggleSidebar }) {
     const { isAuthenticated, user } = useSelector((state) => state.auth);
+
+    const { data: unreadCount = 0 } = useQuery({
+        queryKey: ['unreadNotifications'],
+        queryFn: fetchUnreadCount,
+        enabled: isAuthenticated,
+        refetchInterval: 30000,
+    });
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
@@ -56,6 +69,21 @@ function Header({ toggleSidebar }) {
                     <div className="flex items-center space-x-2 sm:space-x-4">
                         {isAuthenticated ? (
                             <>
+                                <Link
+                                    to="/notifications"
+                                    className="relative p-2 rounded-full hover:bg-white/10 text-text-primary transition-colors"
+                                    title="Notifications"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg>
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                        </span>
+                                    )}
+                                </Link>
+
                                 <Link
                                     to="/upload-video"
                                     className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-black bg-primary rounded-full hover:bg-primary-hover transition-colors"

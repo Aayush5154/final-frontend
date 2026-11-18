@@ -1,17 +1,32 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
 import VideoCard from '../components/VideoCard';
+import ContinueWatchingCard from '../components/ContinueWatchingCard';
 
 const fetchVideos = async () => {
     const { data } = await apiClient.get('/videos');
     return data.data.docs;
 };
 
+const fetchContinueWatching = async () => {
+    const { data } = await apiClient.get('/progress');
+    return data.data;
+};
+
 function Home() {
+    const { isAuthenticated } = useSelector((state) => state.auth);
+
     const { data: videos, error, isLoading, isError } = useQuery({
         queryKey: ['videos'],
         queryFn: fetchVideos,
+    });
+
+    const { data: continueWatching } = useQuery({
+        queryKey: ['continueWatching'],
+        queryFn: fetchContinueWatching,
+        enabled: isAuthenticated,
     });
 
     if (isLoading) {
@@ -32,6 +47,17 @@ function Home() {
 
     return (
         <div className="container mx-auto px-4 py-6 md:py-8">
+            {isAuthenticated && continueWatching?.length > 0 && (
+                <section className="mb-8">
+                    <h2 className="text-xl font-bold text-text-primary mb-4">Continue Watching</h2>
+                    <div className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
+                        {continueWatching.map((item) => (
+                            <ContinueWatchingCard key={item._id} item={item} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
             {videos && videos.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
                     {videos.map((video) => (

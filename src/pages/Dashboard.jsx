@@ -9,6 +9,22 @@ const fetchChannelStats = async () => {
     return data.data;
 };
 
+const fetchChannelAnalytics = async () => {
+    const { data } = await apiClient.get('/dashboard/analytics');
+    return data.data;
+};
+
+const formatCompact = (value = 0) => new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    compactDisplay: 'short',
+}).format(value);
+
+const formatWatchTime = (seconds = 0) => {
+    if (seconds >= 3600) return `${(seconds / 3600).toFixed(1)}h`;
+    if (seconds >= 60) return `${Math.round(seconds / 60)}m`;
+    return `${Math.round(seconds)}s`;
+};
+
 const fetchChannelVideos = async () => {
     const { data } = await apiClient.get('/dashboard/videos');
     return data.data.videos;
@@ -60,6 +76,13 @@ function Dashboard() {
         queryKey: ['dashboardStats'],
         queryFn: fetchChannelStats,
     });
+
+    const { data: analytics } = useQuery({
+        queryKey: ['dashboardAnalytics'],
+        queryFn: fetchChannelAnalytics,
+    });
+
+    const maxDailyViews = Math.max(...(analytics?.daily?.map((day) => day.views) || [0]), 1);
 
     const { data: videos, isLoading: isLoadingVideos } = useQuery({
         queryKey: ['dashboardVideos'],
@@ -218,6 +241,71 @@ function Dashboard() {
                 <div className="bg-background-secondary border border-border p-4 rounded-xl text-center">
                     <p className="text-2xl font-bold text-text-primary">{stats?.totalLikes || 0}</p>
                     <p className="text-text-secondary text-sm">Total Likes</p>
+                </div>
+            </div>
+
+            <div className="bg-background-secondary border border-border p-6 rounded-xl mb-8">
+                <h2 className="text-xl font-bold text-text-primary mb-1">Analytics</h2>
+                <p className="text-sm text-text-secondary mb-6">Views, watch time and engagement on your videos.</p>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-background border border-border p-4 rounded-xl text-center">
+                        <p className="text-2xl font-bold text-text-primary">{formatCompact(analytics?.totals?.views)}</p>
+                        <p className="text-text-secondary text-sm">Views</p>
+                    </div>
+                    <div className="bg-background border border-border p-4 rounded-xl text-center">
+                        <p className="text-2xl font-bold text-text-primary">{formatWatchTime(analytics?.totals?.watchTime)}</p>
+                        <p className="text-text-secondary text-sm">Watch Time</p>
+                    </div>
+                    <div className="bg-background border border-border p-4 rounded-xl text-center">
+                        <p className="text-2xl font-bold text-text-primary">{formatCompact(analytics?.totals?.likes)}</p>
+                        <p className="text-text-secondary text-sm">Likes</p>
+                    </div>
+                    <div className="bg-background border border-border p-4 rounded-xl text-center">
+                        <p className="text-2xl font-bold text-text-primary">{formatCompact(analytics?.totals?.comments)}</p>
+                        <p className="text-text-secondary text-sm">Comments</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <h3 className="text-sm font-semibold text-text-primary mb-3">Daily Views</h3>
+                        <div className="flex items-end gap-2 h-40 bg-background rounded-lg p-3 border border-border">
+                            {analytics?.daily?.map((day) => (
+                                <div key={day.date} className="flex-1 h-full flex flex-col items-center justify-end" title={`${day.views} views`}>
+                                    <div
+                                        className="w-full bg-primary/70 rounded-t transition-all"
+                                        style={{ height: `${Math.max((day.views / maxDailyViews) * 100, day.views > 0 ? 6 : 0)}%` }}
+                                    />
+                                    <span className="text-[10px] text-text-muted mt-1">
+                                        {new Date(`${day.date}T00:00:00Z`).toLocaleDateString(undefined, { weekday: 'short' })}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-xs text-text-muted mt-2">Last {analytics?.daily?.length || 7} days</p>
+                    </div>
+
+                    <div>
+                        <h3 className="text-sm font-semibold text-text-primary mb-3">Weekly Summary</h3>
+                        <div className="space-y-2">
+                            {analytics?.weekly?.map((week, index) => (
+                                <div key={week.weekStart} className="flex items-center justify-between bg-background border border-border rounded-lg px-4 py-2.5 text-sm">
+                                    <span className="text-text-secondary">
+                                        {index === 0
+                                            ? 'This week'
+                                            : `Week of ${new Date(`${week.weekStart}T00:00:00Z`).toLocaleDateString()}`}
+                                    </span>
+                                    <span className="text-text-primary font-medium">
+                                        {formatCompact(week.views)} views · {formatWatchTime(week.watchTime)}
+                                    </span>
+                                </div>
+                            ))}
+                            {analytics?.weekly?.length === 0 && (
+                                <p className="text-text-muted text-sm py-4 text-center">No analytics data yet.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -22,7 +22,7 @@ function Sidebar({ isOpen, onClose }) {
 
     const location = useLocation();
     if (location.pathname !== '/' && location.pathname !== '/history' && location.pathname !== '/liked-videos' && location.pathname !== '/subscriptions') {
-        const allowedPaths = ['/', '/tweets', '/history', '/liked-videos', '/subscriptions', '/upload-video', '/dashboard'];
+        const allowedPaths = ['/', '/tweets', '/history', '/watch-later', '/liked-videos', '/subscriptions', '/notifications', '/upload-video', '/dashboard'];
         const isDynamicAllowed = location.pathname.startsWith('/video/') ||
             location.pathname.startsWith('/channel/') ||
             location.pathname.startsWith('/playlist/') ||
@@ -52,6 +52,11 @@ function Sidebar({ isOpen, onClose }) {
         {
             name: 'History', path: '/history', icon: (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            )
+        },
+        {
+            name: 'Watch Later', path: '/watch-later', icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z" /></svg>
             )
         },
         {
