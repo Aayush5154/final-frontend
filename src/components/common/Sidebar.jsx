@@ -67,7 +67,7 @@ function Sidebar({ isOpen, onClose }) {
     ];
 
     const sidebarClasses = `
-        fixed top-[64px] left-0 h-[calc(100vh-64px)] w-64 bg-background-secondary overflow-y-auto custom-scrollbar pb-4
+        fixed top-[64px] left-0 h-[calc(100vh-64px)] w-64 bg-background-secondary/85 backdrop-blur-sm md:bg-background-secondary md:backdrop-blur-none overflow-y-auto custom-scrollbar pb-4
         transform transition-transform duration-300 z-40 border-r border-border
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
     `;
@@ -76,7 +76,7 @@ function Sidebar({ isOpen, onClose }) {
         <>
             {isOpen && (
                 <div
-                    className="md:hidden fixed inset-0 bg-black/50 z-30"
+                    className="md:hidden fixed inset-0 bg-black/30 z-30"
                     onClick={onClose}
                 />
             )}
