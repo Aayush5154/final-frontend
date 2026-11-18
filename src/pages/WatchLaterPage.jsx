@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
+import Loader from '../components/common/Loader';
 import VideoCard from '../components/VideoCard';
 
 const fetchWatchLater = async () => {
@@ -49,9 +50,11 @@ function WatchLaterPage() {
                             title="Remove from Watch Later"
                             className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-black/70 text-white opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-black/90 transition-opacity disabled:opacity-50"
                         >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            {removeMutation.isPending ? <Loader size="w-4 h-4" /> : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            )}
                         </button>
                     </div>
                 ))}

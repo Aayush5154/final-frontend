@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Loader from './common/Loader';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
 import { formatTimeAgo } from '../utils/time';
@@ -66,9 +67,11 @@ function ContinueWatchingCard({ item }) {
                 title="Remove from Continue Watching"
                 className="absolute top-2 right-2 z-10 flex items-center justify-center w-7 h-7 rounded-full bg-black/70 text-white transition-opacity hover:bg-black/90 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
             >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                {removeMutation.isPending ? <Loader size="w-4 h-4" /> : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                )}
             </button>
         </div>
     );

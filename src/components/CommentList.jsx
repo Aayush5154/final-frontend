@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
+import Loader from './common/Loader';
 import { formatTimeAgo } from '../utils/time';
 import { groupThreads } from '../utils/threads';
 import { useSocket } from '../socket/SocketProvider';
@@ -135,7 +136,7 @@ function CommentList({ videoId }) {
                                 disabled={addCommentMutation.isPending}
                                 className="mt-2 px-4 py-2 bg-primary text-white font-semibold rounded-full hover:bg-primary-hover disabled:opacity-50 transition-colors text-sm"
                             >
-                                {addCommentMutation.isPending && !replyTo ? 'Posting...' : 'Comment'}
+                                <span className="flex items-center">{addCommentMutation.isPending && !replyTo ? <><Loader size="w-3.5 h-3.5" className="mr-1.5" /> Posting...</> : 'Comment'}</span>
                             </button>
                         </div>
                     </form>
@@ -185,7 +186,7 @@ function CommentList({ videoId }) {
                                                             disabled={addCommentMutation.isPending}
                                                             className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded-full hover:bg-primary-hover disabled:opacity-50 transition-colors"
                                                         >
-                                                            {addCommentMutation.isPending ? 'Posting...' : 'Reply'}
+                                                            <span className="flex items-center">{addCommentMutation.isPending ? <><Loader size="w-3.5 h-3.5" className="mr-1.5" /> Posting...</> : 'Reply'}</span>
                                                         </button>
                                                         <button
                                                             type="button"

@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
+import Loader from '../components/common/Loader';
 import { formatTimeAgo } from '../utils/time';
 
 const fetchNotifications = async () => {
@@ -91,7 +92,7 @@ function NotificationsPage() {
                         disabled={markAllMutation.isPending}
                         className="px-4 py-2 text-sm font-medium text-primary bg-primary/10 rounded-full hover:bg-primary/20 disabled:opacity-50 transition-colors"
                     >
-                        {markAllMutation.isPending ? 'Marking...' : 'Mark all as read'}
+                        <span className="flex items-center">{markAllMutation.isPending ? <><Loader size="w-4 h-4" className="mr-2" /> Marking...</> : 'Mark all as read'}</span>
                     </button>
                 )}
             </div>

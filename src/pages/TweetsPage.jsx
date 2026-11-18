@@ -5,6 +5,7 @@ import apiClient from '../api/axios';
 import { formatTimeAgo } from '../utils/time';
 import { useSocket } from '../socket/SocketProvider';
 import TweetComments from '../components/TweetComments';
+import Loader from '../components/common/Loader';
 
 const fetchAllTweets = async () => {
     const { data } = await apiClient.get('/tweets');
@@ -140,7 +141,7 @@ function TweetsPage() {
                             ></textarea>
                             <div className="text-right mt-2">
                                 <button type="submit" disabled={createTweetMutation.isPending} className="px-6 py-2 bg-primary text-white text-sm font-semibold rounded-full hover:bg-primary-hover disabled:opacity-50 transition-colors">
-                                    Tweet
+                                    <span className="flex items-center">{createTweetMutation.isPending ? <><Loader size="w-4 h-4" className="mr-2" /> Posting...</> : 'Tweet'}</span>
                                 </button>
                             </div>
                         </div>
@@ -173,9 +174,11 @@ function TweetsPage() {
                                         className={`flex items-center space-x-1.5 text-sm transition-colors disabled:opacity-50 ${tweet.isLiked ? 'text-primary' : 'text-text-secondary hover:text-white'}`}
                                         title={tweet.isLiked ? 'Unlike' : 'Like'}
                                     >
-                                        <svg className="w-5 h-5" fill={tweet.isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
+                                        {likeMutation.isPending ? <Loader size="w-5 h-5" /> : (
+                                            <svg className="w-5 h-5" fill={tweet.isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                        )}
                                         <span>{tweet.likesCount || 0}</span>
                                     </button>
                                     <button

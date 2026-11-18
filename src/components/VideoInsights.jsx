@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
 import { useSocket } from '../socket/SocketProvider';
+import Loader from './common/Loader';
 
 const fetchInsights = async (videoId) => {
     const { data } = await apiClient.get(`/insights/${videoId}`);
@@ -95,7 +96,7 @@ function VideoInsights({ videoId, isOwner, onSeek }) {
                         disabled={processMutation.isPending}
                         className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded-full hover:bg-primary-hover disabled:opacity-50 transition-colors"
                     >
-                        {processMutation.isPending ? 'Queuing...' : insight ? 'Retry' : 'Generate insights'}
+                        <span className="flex items-center">{processMutation.isPending ? <><Loader size="w-3.5 h-3.5" className="mr-1.5" /> Queuing...</> : insight ? 'Retry' : 'Generate insights'}</span>
                     </button>
                 )}
             </div>

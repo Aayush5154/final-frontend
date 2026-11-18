@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
+import Loader from '../components/common/Loader';
 import { Link } from 'react-router-dom';
 
 const fetchUserPlaylists = async (userId) => {

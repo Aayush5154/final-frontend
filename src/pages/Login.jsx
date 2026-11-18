@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/axios';
 import { login as authLogin } from '../store/authSlice';
+import Loader from '../components/common/Loader';
 
 function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -107,7 +108,7 @@ function Login() {
                             disabled={loading}
                             className="w-full px-4 py-3 font-bold text-white bg-primary rounded-full hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-[0.98]"
                         >
-                            {loading ? 'Logging in...' : 'Sign in'}
+                            <span className="flex items-center justify-center">{loading ? <><Loader size="w-5 h-5" className="mr-2" /> Logging in...</> : 'Sign in'}</span>
                         </button>
                     </div>
                 </form>

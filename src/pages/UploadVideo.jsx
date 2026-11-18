@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/axios';
+import Loader from '../components/common/Loader';
 
 function UploadVideo() {
     const [formData, setFormData] = useState({
@@ -78,7 +79,7 @@ function UploadVideo() {
                         <input type="file" name="thumbnail" onChange={handleChange} required accept="image/*" className="w-full text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors" />
                     </div>
                     <button type="submit" disabled={loading} className="w-full px-4 py-3 font-bold text-white bg-primary rounded-full hover:bg-primary-hover disabled:opacity-50 transition-colors">
-                        {loading ? 'Uploading...' : 'Upload Video'}
+                        <span className="flex items-center justify-center">{loading ? <><Loader size="w-5 h-5" className="mr-2" /> Uploading...</> : 'Upload Video'}</span>
                     </button>
                 </form>
             </div>

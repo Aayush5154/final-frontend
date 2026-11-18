@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axios';
+import Loader from '../components/common/Loader';
 
 const fetchChannelStats = async () => {
     const { data } = await apiClient.get('/dashboard/stats');
@@ -218,7 +219,7 @@ function Dashboard() {
                         <div className="mt-2 flex items-center space-x-4">
                             <input type="file" onChange={handleCoverImageChange} accept="image/*" className="w-full text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors" />
                             <button type="submit" disabled={!coverImageFile || coverImageMutation.isPending} className="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-full hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                                {coverImageMutation.isPending ? 'Uploading...' : 'Upload'}
+                                <span className="flex items-center">{coverImageMutation.isPending ? <><Loader size="w-4 h-4" className="mr-2" /> Uploading...</> : 'Upload'}</span>
                             </button>
                         </div>
                     </div>
@@ -338,7 +339,7 @@ function Dashboard() {
                             disabled={createPlaylistMutation.isPending}
                             className="w-full px-4 py-2 font-bold text-black bg-white rounded-full hover:bg-gray-200 disabled:opacity-50 transition-colors"
                         >
-                            {createPlaylistMutation.isPending ? 'Creating...' : 'Create Playlist'}
+                            <span className="flex items-center justify-center">{createPlaylistMutation.isPending ? <><Loader size="w-4 h-4" className="mr-2" /> Creating...</> : 'Create Playlist'}</span>
                         </button>
                     </form>
                 </div>
@@ -357,7 +358,7 @@ function Dashboard() {
                                     className="ml-4 px-3 py-1.5 text-xs font-medium text-white bg-red-600/20 text-red-500 rounded-full hover:bg-red-600/30 transition-colors disabled:opacity-50"
                                     disabled={deletePlaylistMutation.isPending}
                                 >
-                                    Delete
+                                    <span className="flex items-center">{deletePlaylistMutation.isPending ? <Loader size="w-3.5 h-3.5" className="mr-1.5" /> : null}Delete</span>
                                 </button>
                             </div>
                         ))}
@@ -407,7 +408,7 @@ function Dashboard() {
                                         className="px-3 py-1.5 text-xs font-medium bg-red-600/20 text-red-500 rounded-full hover:bg-red-600/30 transition-colors disabled:opacity-50"
                                         disabled={deleteVideoMutation.isPending}
                                     >
-                                        {deleteVideoMutation.isPending && deleteVideoMutation.variables === video._id ? 'Deleting...' : 'Delete'}
+                                        <span className="flex items-center">{deleteVideoMutation.isPending && deleteVideoMutation.variables === video._id ? <><Loader size="w-3.5 h-3.5" className="mr-1.5" /> Deleting...</> : 'Delete'}</span>
                                     </button>
                                 </td>
                             </tr>

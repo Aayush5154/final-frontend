@@ -7,6 +7,7 @@ import CommentList from '../components/CommentList';
 import VideoInsights from '../components/VideoInsights';
 import VideoChat from '../components/VideoChat';
 import PlaylistModal from '../components/PlaylistModal';
+import Loader from '../components/common/Loader';
 
 const fetchVideoById = async (videoId) => {
     const { data } = await apiClient.get(`/videos/${videoId}`);
@@ -181,7 +182,7 @@ function VideoDetail() {
                                             : 'bg-white/10 text-white hover:bg-white/20'
                                         }`}
                                 >
-                                    <span>👍</span>
+                                    {likeMutation.isPending ? <Loader size="w-4 h-4" /> : <span>👍</span>}
                                     <span>{formatNumber(video.likesCount)}</span>
                                 </button>
                                 <button
@@ -192,9 +193,11 @@ function VideoDetail() {
                                             : 'bg-white/10 text-white hover:bg-white/20'
                                         }`}
                                 >
-                                    <svg className="w-4 h-4" fill={video.isInWatchLater ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z" />
-                                    </svg>
+                                    {watchLaterMutation.isPending ? <Loader size="w-4 h-4" /> : (
+                                        <svg className="w-4 h-4" fill={video.isInWatchLater ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z" />
+                                        </svg>
+                                    )}
                                     <span>{video.isInWatchLater ? 'Saved' : 'Watch Later'}</span>
                                 </button>
                                 <button
@@ -230,7 +233,7 @@ function VideoDetail() {
                                         : 'bg-primary text-white hover:bg-primary-hover'
                                     }`}
                             >
-                                {subscriptionMutation.isPending ? '...' : (video.owner.isSubscribed ? 'Subscribed' : 'Subscribe')}
+                                <span className="flex items-center justify-center">{subscriptionMutation.isPending ? <><Loader size="w-4 h-4" className="mr-2" /> Subscribing...</> : (video.owner.isSubscribed ? 'Subscribed' : 'Subscribe')}</span>
                             </button>
                         )}
                     </div>

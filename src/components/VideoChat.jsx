@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
+import Loader from './common/Loader';
 
 const fetchChat = async (videoId) => {
     const { data } = await apiClient.get(`/chat/${videoId}`);
@@ -157,7 +158,7 @@ function VideoChat({ videoId, isAuthenticated, onSeek }) {
                             disabled={!question.trim() || askMutation.isPending || !transcriptReady}
                             className="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover disabled:opacity-50 transition-colors"
                         >
-                            Send
+                            <span className="flex items-center">{askMutation.isPending ? <><Loader size="w-4 h-4" className="mr-2" /> Sending...</> : 'Send'}</span>
                         </button>
                     </form>
                 </>

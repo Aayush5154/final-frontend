@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/axios';
+import Loader from '../components/common/Loader';
 
 function Signup() {
     const [formData, setFormData] = useState({
@@ -94,7 +95,7 @@ function Signup() {
                         <input type="file" name="avatar" onChange={handleChange} required accept="image/*" className="w-full text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors" />
                     </div>
                     <button type="submit" disabled={loading} className="w-full px-4 py-3 font-bold text-white bg-primary rounded-full hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] mt-2">
-                        {loading ? 'Creating Account...' : 'Sign Up'}
+                        <span className="flex items-center justify-center">{loading ? <><Loader size="w-5 h-5" className="mr-2" /> Creating Account...</> : 'Sign Up'}</span>
                     </button>
                 </form>
                 <p className="text-sm text-center text-text-secondary">

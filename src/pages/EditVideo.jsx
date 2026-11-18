@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
+import Loader from '../components/common/Loader';
 
 const fetchVideoById = async (videoId) => {
     const { data } = await apiClient.get(`/videos/${videoId}`);
@@ -127,7 +128,7 @@ function EditVideo() {
                         />
                     </div>
                     <button type="submit" disabled={updateMutation.isPending} className="w-full px-4 py-3 font-bold text-white bg-primary rounded-full hover:bg-primary-hover disabled:opacity-50 transition-colors">
-                        {updateMutation.isPending ? 'Updating...' : 'Save Changes'}
+                        <span className="flex items-center justify-center">{updateMutation.isPending ? <><Loader size="w-5 h-5" className="mr-2" /> Updating...</> : 'Save Changes'}</span>
                     </button>
                 </form>
             </div>
