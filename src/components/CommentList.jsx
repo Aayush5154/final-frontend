@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
 import { formatTimeAgo } from '../utils/time';
+import { groupThreads } from '../utils/threads';
+import { useSocket } from '../socket/SocketProvider';
 
 const fetchComments = async (videoId) => {
     const { data } = await apiClient.get(`/comments/${videoId}`);
@@ -16,6 +18,7 @@ const addComment = async ({ videoId, content, parent }) => {
 
 function CommentList({ videoId }) {
     const queryClient = useQueryClient();
+    const socket = useSocket();
     const { isAuthenticated, user } = useSelector((state) => state.auth);
     const [newComment, setNewComment] = useState('');
     const [replyTo, setReplyTo] = useState(null);
@@ -37,21 +40,58 @@ function CommentList({ videoId }) {
         },
     });
 
-    const topLevelComments = useMemo(
-        () => (comments || []).filter((comment) => !comment.parent),
+    useEffect(() => {
+        if (!socket || !videoId) return undefined;
+
+        const updateComments = (updater) => {
+            queryClient.setQueryData(['comments', videoId], (current) => {
+                if (!Array.isArray(current)) return current;
+                return updater(current);
+            });
+        };
+
+        const joinVideoRoom = () => socket.emit('video:join', videoId);
+        joinVideoRoom();
+        socket.on('connect', joinVideoRoom);
+
+        const handleNewComment = (comment) => {
+            if (!comment?._id || String(comment.video) !== String(videoId)) return;
+            updateComments((current) => (
+                current.some((item) => item._id === comment._id)
+                    ? current
+                    : [...current, comment]
+            ));
+        };
+
+        const handleUpdatedComment = (comment) => {
+            if (!comment?._id) return;
+            updateComments((current) => current.map((item) => (
+                item._id === comment._id ? { ...item, ...comment } : item
+            )));
+        };
+
+        const handleDeletedComment = (deleted) => {
+            if (!deleted?._id) return;
+            updateComments((current) => current.filter((item) => item._id !== deleted._id));
+        };
+
+        socket.on('comment:new', handleNewComment);
+        socket.on('comment:updated', handleUpdatedComment);
+        socket.on('comment:deleted', handleDeletedComment);
+
+        return () => {
+            socket.emit('video:leave', videoId);
+            socket.off('connect', joinVideoRoom);
+            socket.off('comment:new', handleNewComment);
+            socket.off('comment:updated', handleUpdatedComment);
+            socket.off('comment:deleted', handleDeletedComment);
+        };
+    }, [socket, videoId, queryClient]);
+
+    const { topLevel: topLevelComments, repliesByParent } = useMemo(
+        () => groupThreads(comments || []),
         [comments]
     );
-
-    const repliesByParent = useMemo(() => {
-        return (comments || []).reduce((acc, comment) => {
-            if (!comment.parent) return acc;
-
-            const key = String(comment.parent);
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(comment);
-            return acc;
-        }, {});
-    }, [comments]);
 
     const handleCommentSubmit = (e) => {
         e.preventDefault();
