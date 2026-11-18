@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
 import CommentList from '../components/CommentList';
 import VideoInsights from '../components/VideoInsights';
+import VideoChat from '../components/VideoChat';
 import PlaylistModal from '../components/PlaylistModal';
 
 const fetchVideoById = async (videoId) => {
@@ -139,6 +140,12 @@ function VideoDetail() {
     const isOwner = loggedInUser?._id === video?.owner?._id;
 
     const formatNumber = (num) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(num);
+    const handleSeek = (seconds) => {
+        const player = videoRef.current;
+        if (!player) return;
+        player.currentTime = seconds;
+        player.play().catch(() => {});
+    };
 
     return (
         <>
@@ -235,12 +242,12 @@ function VideoDetail() {
                     <VideoInsights
                         videoId={videoId}
                         isOwner={isOwner}
-                        onSeek={(seconds) => {
-                            const player = videoRef.current;
-                            if (!player) return;
-                            player.currentTime = seconds;
-                            player.play().catch(() => {});
-                        }}
+                        onSeek={handleSeek}
+                    />
+                    <VideoChat
+                        videoId={videoId}
+                        isAuthenticated={isAuthenticated}
+                        onSeek={handleSeek}
                     />
 
                     <div className="mt-8">
