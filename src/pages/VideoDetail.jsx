@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
 import CommentList from '../components/CommentList';
+import VideoInsights from '../components/VideoInsights';
 import PlaylistModal from '../components/PlaylistModal';
 
 const fetchVideoById = async (videoId) => {
@@ -230,6 +231,17 @@ function VideoDetail() {
                     <div className="mt-4 p-4 bg-background-secondary rounded-xl text-sm border border-border">
                         <p className="text-text-primary whitespace-pre-wrap leading-relaxed">{video.description}</p>
                     </div>
+
+                    <VideoInsights
+                        videoId={videoId}
+                        isOwner={isOwner}
+                        onSeek={(seconds) => {
+                            const player = videoRef.current;
+                            if (!player) return;
+                            player.currentTime = seconds;
+                            player.play().catch(() => {});
+                        }}
+                    />
 
                     <div className="mt-8">
                         <CommentList videoId={videoId} />
