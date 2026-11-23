@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import apiClient from '../api/axios';
 import VideoCard from '../components/VideoCard';
 import ContinueWatchingCard from '../components/ContinueWatchingCard';
+import Loader from '../components/common/Loader';
 
 const fetchVideos = async () => {
     const { data } = await apiClient.get('/videos');
@@ -15,8 +16,15 @@ const fetchContinueWatching = async () => {
     return data.data;
 };
 
+const fetchRecommendations = async () => {
+    const { data } = await apiClient.get('/recommendations', {
+        params: { page: 1, limit: 8 },
+    });
+    return data.data;
+};
+
 function Home() {
-    const { isAuthenticated } = useSelector((state) => state.auth);
+    const { isAuthenticated, user } = useSelector((state) => state.auth);
 
     const { data: videos, error, isLoading, isError } = useQuery({
         queryKey: ['videos'],
@@ -28,6 +36,18 @@ function Home() {
         queryFn: fetchContinueWatching,
         enabled: isAuthenticated,
     });
+
+    const {
+        data: recommendations,
+        isLoading: isLoadingRecommendations,
+    } = useQuery({
+        queryKey: ['recommendations', user?._id],
+        queryFn: fetchRecommendations,
+        enabled: isAuthenticated,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const recommendedVideos = recommendations?.videos || [];
 
     if (isLoading) {
         return (
@@ -55,6 +75,38 @@ function Home() {
                             <ContinueWatchingCard key={item._id} item={item} />
                         ))}
                     </div>
+                </section>
+            )}
+
+            {isAuthenticated && (isLoadingRecommendations || recommendedVideos.length > 0) && (
+                <section className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-xl font-bold text-text-primary">Recommended for You</h2>
+                            {recommendations?.personalized && (
+                                <span className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                                    Personalized
+                                </span>
+                            )}
+                        </div>
+                        <span className="hidden sm:block text-sm text-text-muted">
+                            {recommendations?.personalized
+                                ? 'Based on your activity'
+                                : 'Trending on VideoTube'}
+                        </span>
+                    </div>
+                    {isLoadingRecommendations ? (
+                        <div className="flex items-center justify-center gap-3 py-10 text-text-secondary">
+                            <Loader size="w-5 h-5" className="text-primary" />
+                            <span className="text-sm">Finding videos for you...</span>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
+                            {recommendedVideos.map((video) => (
+                                <VideoCard key={video._id} video={video} />
+                            ))}
+                        </div>
+                    )}
                 </section>
             )}
 
