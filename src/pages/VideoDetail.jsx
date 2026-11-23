@@ -7,6 +7,7 @@ import CommentList from '../components/CommentList';
 import VideoInsights from '../components/VideoInsights';
 import VideoChat from '../components/VideoChat';
 import PlaylistModal from '../components/PlaylistModal';
+import VideoPlayer from '../components/VideoPlayer';
 import Loader from '../components/common/Loader';
 
 const fetchVideoById = async (videoId) => {
@@ -153,17 +154,13 @@ function VideoDetail() {
             <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
                     <div className="w-full bg-black aspect-video rounded-xl overflow-hidden shadow-lg border border-border">
-                        <video
-                            ref={videoRef}
-                            src={video.videoFile}
-                            controls
-                            autoPlay
-                            muted
-                            className="w-full h-full"
+                        <VideoPlayer
+                            video={video}
+                            videoRef={videoRef}
                             onLoadedMetadata={handleLoadedMetadata}
                             onPause={handleProgressSave}
                             onEnded={handleProgressSave}
-                        ></video>
+                        />
                     </div>
                     <div className="mt-4">
                         <h1 className="text-xl md:text-2xl font-bold text-text-primary">{video.title}</h1>
